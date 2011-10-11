@@ -1,5 +1,10 @@
 <ul>
 <% @readings.each do |reading| %>
-  <li><%= reading.time %> <%= reading.noise %></li>
+  <li><%= reading.time %>: <strong><%= reading.noise %></strong>, <%= reading.room %></li>
 <% end %>
 </ul>
+
+<form action="/jroom/" method="post">
+  <input type="hidden" name="noise" value="140"/>
+  <input type="submit"/>
+</form>
