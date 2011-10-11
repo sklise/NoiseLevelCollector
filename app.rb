@@ -27,7 +27,7 @@ get "/:room/:start_time/:n_readings" do
 end
 
 post "/:room/" do
-  # params = :noise, :room, :time?
+  # params = :noise, :room
   r = Reading.new(:time => Time.now, :room => params[:room], :noise => params[:noise])
   if r.save
     output = "success"
