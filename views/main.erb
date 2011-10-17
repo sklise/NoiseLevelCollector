@@ -1,4 +1,4 @@
-<h1><%= @ip %></h1>
+<h1>User: <%= /([0-9\-]*)/.match(@ip)[1] %></h1>
 
 <ul>
 <% @readings.each do |reading| %>
