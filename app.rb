@@ -3,6 +3,15 @@ Bundler.require
 
 DataMapper.setup(:default,  ENV['DATABASE_URL'] || 'sqlite:///Users/sklise/ITP/Understanding Networks/FloorNoise/NoiseApp/data.db')
 
+class Reading
+  include DataMapper::Resource
+
+  property :id, Serial, :key => true
+  property :time, Time
+  property :noise, Integer
+  property :room, String
+end
+
 get "/" do
   @readings = Reading.all(:order => [:id.desc], :limit => 10)
   erb :main
@@ -52,13 +61,4 @@ post "/:room/" do
     puts ""
   end
   ""
-end
-
-class Reading
-  include DataMapper::Resource
-
-  property :id, Serial, :key => true
-  property :time, Time
-  property :noise, Integer
-  property :room, String
 end
