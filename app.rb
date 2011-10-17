@@ -1,5 +1,6 @@
 require 'bundler'
 Bundler.require
+require 'socket'
 
 DataMapper.setup(:default,  ENV['DATABASE_URL'] || 'sqlite:///Users/sklise/ITP/Understanding Networks/FloorNoise/NoiseApp/data.db')
 
@@ -13,6 +14,7 @@ class Reading
 end
 
 get "/" do
+  @ip = Socket.gethostname
   @readings = Reading.all(:order => [:id.desc], :limit => 10)
   erb :main
 end
