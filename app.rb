@@ -8,23 +8,21 @@ class Reading
   include DataMapper::Resource
 
   property :id, Serial, :key => true
-  property :time, Time
+  property :time, DateTime
   property :noise, Integer
   property :room, String
 end
 
 get "/" do
-  @ip = Socket.gethostname
   @readings = Reading.all(:order => [:id.desc], :limit => 10)
   erb :main
 end
 
-get "/:room/:start_time/:n_readings" do
+get "/:room/:n_readings" do
   content_type :json
   readings = Reading.all({
     :limit => params["n_readings"].to_i,
-    :room => params["room"],
-    :time.gt => params["start_time"]
+    :room => params["room"]
   })
   full_response = []
   readings.each do |r|
@@ -39,7 +37,9 @@ end
 
 post "/:room/" do
   # params = :noise, :room
-  @readings = params[:noise][1,params[:noise].length-2].split(',') # array of readings, ordered first to last
+  # raise params.inspect
+  # params[:noise] => "120,130,140,12,215,255,319"
+  @readings = params[:noise].split(',') # array of readings, ordered first to last
   @now = Time.now # times for readings will be back-dated from right now
   r_length = @readings.length # how many readings were sent?
 
