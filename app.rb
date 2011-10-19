@@ -18,8 +18,8 @@ get "/" do
   erb :main
 end
 
-get "/:room/:n_readings" do
-  content_type :json
+get "/:room/:date.:format" do
+  # :date => 20111019 (YYYYMMDD)
   readings = Reading.all({
     :limit => params["n_readings"].to_i,
     :room => params["room"]
@@ -28,11 +28,11 @@ get "/:room/:n_readings" do
   readings.each do |r|
     single_response = {}
     r.attributes.each do |k,v|
-      single_response[k] = v
+      params[:format] == "json" ? single_response[k] = v : single_response = "#{v},"
     end
-    full_response << single_response.to_json
+    full_response << (params[:format] == "json" ? single_response.to_json : single_response)
   end
-  "{"+full_response.join(",")+"}"
+  params[:format] == "json" ? "{"+full_response.join(",")+"}" : full_response.join("\n")
 end
 
 post "/:room/" do
