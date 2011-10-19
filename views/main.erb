@@ -1,3 +1,5 @@
+<%= Time.now %>
+
 <ul>
 <% @readings.each do |reading| %>
   <li><%= reading.time %>: <strong><%= reading.noise %></strong>, <%= reading.room %></li>
