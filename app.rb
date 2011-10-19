@@ -49,7 +49,7 @@ post "/:room/" do
   puts @now
   puts ""
 
-  if Time.now.hour >= 9-3 && Time.now <= 23-3
+  # if Time.now.hour >= 9-3 && Time.now <= 23
     puts "\e[0;34m#{params[:room]}\e[m"
     @readings.each_with_index do |r,i|
       reading = Reading.new(:time => @now-(r_length-i)*interval/1000, :room => params[:room], :noise => r)
@@ -63,6 +63,6 @@ post "/:room/" do
       end
       puts ""
     end
-  end
+  # end
   ""
 end
