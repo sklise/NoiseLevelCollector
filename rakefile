@@ -19,7 +19,7 @@ task :make_csv do
     full_response << single_response
   end
   thecsv = full_response.join("\n")
-  filename = date+'.csv'
+  filename = 'public/'+date+'.csv'
   f = File.open(filename,'w')
   f.write(thecsv)
   f.close
