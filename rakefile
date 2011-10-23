@@ -1,33 +1,33 @@
-# require 'rake'
-# require 'rubygems'
-# 
-# task :make_csv do
-#   require './app.rb'
-# 
-#   date = '20111018'
-#   @readings = Reading.all({
-#     :time.gt => date.to_i-1,
-#     :time.lt => date.to_i+1,
-#     :room => 'jroom'
-#   })
-#   full_response = []
-#   @readings.each do |r|
-#     single_response = ""
-#     r.attributes.each do |k,v|
-#       single_response += "#{v},"
-#     end
-#     full_response << single_response
-#   end
-#   thecsv = full_response.join("\n")
-#   puts thecsv.length
-#   filename = 'public/'+date+'.csv'
-#   if SavedValues.create(:contents => thecsv)
-#     puts "success"
-#     puts SavedValues.all
-#   else
-#     puts "failed"
-#   end
-#   f = File.open(filename,'w')
-#   f.write(thecsv)
-#   f.close
-# end
+require 'rake'
+require 'rubygems'
+
+task :make_csv do
+  require './app.rb'
+
+  date = '20111018'
+  @readings = Reading.all({
+    :time.gt => date.to_i-1,
+    :time.lt => date.to_i+1,
+    :room => 'jroom'
+  })
+  full_response = []
+  @readings.each do |r|
+    single_response = ""
+    r.attributes.each do |k,v|
+      single_response += "#{v},"
+    end
+    full_response << single_response
+  end
+  thecsv = full_response.join("\n")
+  puts thecsv.length
+  filename = 'public/'+date+'.csv'
+  if SavedValues.create(:contents => thecsv)
+    puts "success"
+    puts SavedValues.all
+  else
+    puts "failed"
+  end
+  f = File.open(filename,'w')
+  f.write(thecsv)
+  f.close
+end
