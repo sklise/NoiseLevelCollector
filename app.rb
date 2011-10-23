@@ -13,6 +13,12 @@ class Reading
   property :room, String
 end
 
+class CSV
+  include DataMapper::Resource
+  property :id, Serial, :key => true
+  property :contents, Text
+end
+
 get "/" do
   @readings = Reading.all(:order => [:id.desc], :limit => 10)
   erb :main
