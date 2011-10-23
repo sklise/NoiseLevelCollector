@@ -4,7 +4,7 @@ require 'rubygems'
 task :make_csv do
   require './app.rb'
 
-  date = '20111019'
+  date = '20111018'
   @readings = Reading.all({
     :time.gt => date.to_i-1,
     :time.lt => date.to_i+1,
@@ -19,7 +19,14 @@ task :make_csv do
     full_response << single_response
   end
   thecsv = full_response.join("\n")
+  puts thecsv.length
   filename = 'public/'+date+'.csv'
+  if SavedValues.create(:contents => thecsv)
+    puts "success"
+    puts SavedValues.all
+  else
+    puts "failed"
+  end
   f = File.open(filename,'w')
   f.write(thecsv)
   f.close

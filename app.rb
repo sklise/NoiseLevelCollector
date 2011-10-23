@@ -2,7 +2,7 @@ require 'bundler'
 Bundler.require
 require 'socket'
 
-DataMapper.setup(:default,  ENV['DATABASE_URL'] || 'sqlite:///Users/sklise/ITP/Understanding Networks/FloorNoise/NoiseApp/data.db')
+DataMapper.setup(:default, 'sqlite:///Users/sklise/ITP/Understanding Networks/FloorNoise/NoiseApp/data.db')
 
 class Reading
   include DataMapper::Resource
@@ -13,8 +13,9 @@ class Reading
   property :room, String
 end
 
-class CSV
+class SavedValues
   include DataMapper::Resource
+
   property :id, Serial, :key => true
   property :contents, Text
 end
