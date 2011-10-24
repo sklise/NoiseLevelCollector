@@ -4,12 +4,7 @@ require 'rubygems'
 task :make_csv do
   require './app.rb'
 
-  date = 'all'
-  @readings = Reading.all({
-    # :time.gt => date.to_i-1,
-    # :time.lt => date.to_i+1,
-    :room => 'jroom'
-  })
+  @readings = Reading.all(:room => 'jroom')
   full_response = []
   @readings.each do |r|
     single_response = ""
@@ -25,29 +20,31 @@ task :make_csv do
   end
   thecsv = full_response.join("\n")
   puts thecsv.length
-  filename = 'public/'+date+'.csv'
+  filename = 'public/all.csv'
   f = File.open(filename,'w')
   f.write(thecsv)
   f.close
 end
 
 task :split_by_day do
-  csv = File.open('public/all.csv','r').readlines
+  if csv = File.open('public/all.csv','r').readlines
+    dates = {}
 
-  dates = {}
+    csv.each do |row|
+      r = row.chomp.split(',')
+      t = Time.at(r[0].to_i)
+      day_string = "#{t.year}#{t.month}#{t.day}"
+      dates[day_string] ||= []
+      dates[day_string] << r.join(",")
+    end
 
-  csv.each do |row|
-    r = row.chomp.split(',')
-    t = Time.at(r[0].to_i)
-    day_string = "#{t.year}#{t.month}#{t.day}"
-    dates[day_string] ||= []
-    dates[day_string] << r.join(",")
-  end
-
-  dates.each do |k,v|
-    f = File.open('public/'+k+'.csv','w')
-    f.write(v.join("\n"))
-    f.close
+    dates.each do |k,v|
+      f = File.open('public/'+k+'.csv','w')
+      f.write(v.join("\n"))
+      f.close
+    end
+  else
+    puts "\e[0;33mERROR\e[m; Could Not Find public/all.csv"
   end
 end
 
