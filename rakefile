@@ -4,30 +4,90 @@ require 'rubygems'
 task :make_csv do
   require './app.rb'
 
-  date = '20111018'
+  date = 'all'
   @readings = Reading.all({
-    :time.gt => date.to_i-1,
-    :time.lt => date.to_i+1,
+    # :time.gt => date.to_i-1,
+    # :time.lt => date.to_i+1,
     :room => 'jroom'
   })
   full_response = []
   @readings.each do |r|
     single_response = ""
     r.attributes.each do |k,v|
-      single_response += "#{v},"
+      if k == :time
+        single_response += (v.to_time.utc.getlocal.to_i+25200).to_s
+        single_response += ","
+      elsif k == :noise
+        single_response += v.to_s
+      end
     end
     full_response << single_response
   end
   thecsv = full_response.join("\n")
   puts thecsv.length
   filename = 'public/'+date+'.csv'
-  if SavedValues.create(:contents => thecsv)
-    puts "success"
-    puts SavedValues.all
-  else
-    puts "failed"
-  end
   f = File.open(filename,'w')
   f.write(thecsv)
   f.close
+end
+
+task :split_by_day do
+  csv = File.open('public/all.csv','r').readlines
+
+  dates = {}
+
+  csv.each do |row|
+    r = row.chomp.split(',')
+    t = Time.at(r[0].to_i)
+    day_string = "#{t.year}#{t.month}#{t.day}"
+    dates[day_string] ||= []
+    dates[day_string] << r.join(",")
+  end
+
+  dates.each do |k,v|
+    f = File.open('public/'+k+'.csv','w')
+    f.write(v.join("\n"))
+    f.close
+  end
+end
+
+task :split_by_day_average do
+  if csv = File.open('public/all.csv','r').readlines
+    puts "Opened public/all.csv"
+    dates = {}
+
+    csv.each do |row|
+      r = row.chomp.split(',')
+      t = Time.at(r[0].to_i)
+      day_string = "#{t.year}-#{t.month}-#{t.day}"
+      dates[day_string] ||= {}
+      dates[day_string][t.hour] ||= {}
+      dates[day_string][t.hour][t.min] ||= []
+      dates[day_string][t.hour][t.min] << r[1]
+    end
+
+    dates.each do |k,v|
+      f = File.open('public/'+k+'-minutes.csv','w')
+      averaged_output = []
+      # hours
+      puts k
+      v.each do |hour,min_hash|
+        #minutes
+        min_hash.each do |minute,noise_levels|
+          readings_count = noise_levels.length.to_f
+          total = 0
+          noise_levels.each do |n|
+            total += n.to_i
+          end
+          average = (total/readings_count).round
+          date = k.split('-')
+          averaged_output << [ Time.new(date[0],date[1],date[2],hour,minute), average ].join(',')
+        end
+      end
+      f.write(averaged_output.join("\n"))
+      f.close
+    end
+  else
+    puts "\e[0;33mERROR\e[m; Could Not Find public/all.csv"
+  end
 end
