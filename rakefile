@@ -104,3 +104,71 @@ task :split_by_day_average do
     puts "\e[0;33mERROR\e[m; Could Not Find public/all.csv"
   end
 end
+
+task :two_minutes do
+  if csv = File.open('public/all.csv','r').readlines
+    puts "Opened public/all.csv"
+    dates = {}
+
+    csv.each do |row|
+      r = row.chomp.split(',')
+      t = Time.at(r[0].to_i)
+      day_string = "#{t.year}-#{t.month}-#{t.day}"
+      if dates[day_string].nil?
+        dates[day_string] = {}
+        puts day_string
+        h = 0
+        24.times do
+          dates[day_string][h] ||= {}
+          m = 0
+          60.times do
+            dates[day_string][h][m] ||= []
+            m += 1
+          end
+          h += 1
+        end
+      end
+      dates[day_string][t.hour][t.min] << r[1]
+    end
+
+    dates.each do |k,v|
+      f = File.open('public/'+k+'-twominutes.csv','w')
+      averaged_output = []
+      leveraged_output = []
+      # hours
+      v.each do |hour,min_hash|
+        #minutes
+        min_hash.each do |minute,noise_levels|
+          # puts minute if k == "2011-10-22"
+          readings_count = noise_levels.length.to_f
+          if readings_count != 0
+            total = 0
+            noise_levels.each do |n|
+              total += n.to_i
+            end
+            average = (total/readings_count).round
+            date = k.split('-')
+            # averaged_output << [ Time.new(date[0],date[1],date[2],hour,minute), average ].join(',')
+            averaged_output << [ hour*60+minute, average ]
+          else
+            averaged_output << [ hour*60+minute, 0]
+          end
+        end
+      end
+
+      l = (averaged_output.length)/2
+      count = 0
+      l.times do
+        a1 = averaged_output[count]
+        a2 = averaged_output[count+1]
+        leveraged_output << [a1[0], ((a1[1]+a2[1])/2.0).round].join(",")
+        count += 2
+      end
+
+      f.write(leveraged_output.join("\n"))
+      f.close
+    end
+  else
+    puts "\e[0;33mERROR\e[m; Could Not Find public/all.csv"
+  end
+end

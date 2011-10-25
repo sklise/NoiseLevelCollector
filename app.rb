@@ -2,7 +2,7 @@ require 'bundler'
 Bundler.require
 require 'socket'
 
-DataMapper.setup(:default,  ENV['DATABASE_URL'] || 'sqlite:///Users/sklise/ITP/Understanding Networks/FloorNoise/NoiseApp/data.db')
+DataMapper.setup(:default,  ENV['DATABASE_URL'] || 'sqlite:///Users/sklise/ITP/Understanding_Networks/FloorNoise/NoiseLevelCollector/Understanding.sqlite')
 
 class Reading
   include DataMapper::Resource
@@ -15,7 +15,7 @@ end
 
 class SavedValues
   include DataMapper::Resource
-  
+
   property :id, Serial, :key => true
   property :contents, Text
 end
@@ -59,7 +59,7 @@ post "/:room/" do
   # if Time.now.hour >= 9-3 && Time.now <= 23
     puts "\e[0;34m#{params[:room]}\e[m"
     @readings.each_with_index do |r,i|
-      reading = Reading.new(:time => @now-(r_length-i)*interval/1000, :room => params[:room], :noise => r)
+      reading = Reading.new(:time => @now-(r_length-i)*interval/1000.to_i, :room => params[:room], :noise => r)
       puts "  #{reading.time}"
       puts "  #{reading.noise}"
     
