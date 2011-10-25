@@ -1,6 +1,7 @@
 require 'rake'
 require 'rubygems'
 
+desc "Get all Readings and save to a csv file"
 task :make_csv do
   require './app.rb'
 
@@ -26,6 +27,7 @@ task :make_csv do
   f.close
 end
 
+desc "Split up a master csv into daily csvs"
 task :split_by_day do
   if csv = File.open('public/all.csv','r').readlines
     dates = {}
@@ -48,6 +50,7 @@ task :split_by_day do
   end
 end
 
+desc "Split all.csv into daily files averaged each minute"
 task :split_by_day_average do
   if csv = File.open('public/all.csv','r').readlines
     puts "Opened public/all.csv"
@@ -105,6 +108,7 @@ task :split_by_day_average do
   end
 end
 
+desc "Split all.csv into daily files averaged every two minutes"
 task :two_minutes do
   if csv = File.open('public/all.csv','r').readlines
     puts "Opened public/all.csv"
