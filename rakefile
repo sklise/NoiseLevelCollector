@@ -50,6 +50,67 @@ task :split_by_day do
   end
 end
 
+desc "Average every minute"
+task :all_avg do
+  if csv = File.open('public/all.csv','r').readlines
+    puts "Opened public/all.csv"
+    dates = {}
+
+    csv.each do |row|
+      r = row.chomp.split(',')
+      t = Time.at(r[0].to_i)
+      day_string = "#{t.year}-#{t.month}-#{t.day}"
+      if dates[day_string].nil?
+        dates[day_string] = {}
+        puts day_string
+        h = 0
+        24.times do
+          dates[day_string][h] ||= {}
+          m = 0
+          60.times do
+            dates[day_string][h][m] ||= []
+            m += 1
+          end
+          h += 1
+        end
+      end
+      dates[day_string][t.hour][t.min] << r[1]
+    end
+
+    averaged_output = []
+    f = File.open('public/all_avg.csv','w')
+    dates.each do |k,v|
+      
+      # hours
+      v.each do |hour,min_hash|
+        #minutes
+        min_hash.each do |minute,noise_levels|
+          # puts minute if k == "2011-10-22"
+          readings_count = noise_levels.length.to_f
+          if readings_count != 0
+            total = 0
+            noise_levels.each do |n|
+              total += n.to_i
+            end
+            average = (total/readings_count).round
+            date = k.split('-')
+            # averaged_output << [ Time.new(date[0],date[1],date[2],hour,minute), average ].join(',')
+            averaged_output << [ "#{k} #{hour}:#{minute}:00", average ].join(',')
+          else
+            averaged_output << [ "#{k} #{hour}:#{minute}:00", 0].join(',')
+          end
+        end
+      end
+    end
+    f.write(averaged_output.join("\n"))
+    f.close
+  else
+    puts "\e[0;33mERROR\e[m; Could Not Find public/all.csv"
+  end
+end
+
+
+
 desc "Split all.csv into daily files averaged each minute"
 task :split_by_day_average do
   if csv = File.open('public/all.csv','r').readlines
