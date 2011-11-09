@@ -32,7 +32,7 @@ end
 # `main` which is located in `/views/main.erb`.
 get "/" do
   @readings = Reading.all(:order => [:id.desc], :limit => 10)
-  erb :main
+  erb :visualization
 end
 
 # This is the path that the Arduino is posting its data to.
